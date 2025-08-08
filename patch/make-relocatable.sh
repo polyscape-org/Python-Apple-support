@@ -24,4 +24,17 @@ for module in `find . -name "*.dylib" -type f -o -name "*.so" -type f`; do
        done
     fi
 done
-popd
+
+for exe in ./bin/*; do
+    if [ -f "$exe" ] && [ -x "$exe" ] && [ ! -L "$exe" ]; then
+        echo "Rewrite references to Python library in ${exe}"
+        install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHON_VER}/Python @rpath/Python.framework/Versions/${PYTHON_VER}/Python ${exe}
+        echo "Add rpath to ${exe}"
+        install_name_tool -add_rpath @executable_path/../../../.. ${exe}
+    fi
+done
+
+echo "Rewrite references to Python library in Python executable"
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHON_VER}/Python @rpath/Python.framework/Versions/${PYTHON_VER}/Python ./Resources/Python.app/Contents/MacOS/Python
+echo "Add rpath to Python executable"
+install_name_tool -add_rpath @executable_path/../../../../../../.. ./Resources/Python.app/Contents/MacOS/Python

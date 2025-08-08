@@ -609,6 +609,12 @@ $$(PYTHON_XCFRAMEWORK-$(os))/Info.plist: \
 		2>&1 | tee -a $$(PYTHON_INSTALL-macosx)/python-$(os).codesign.log
 	codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f $$(PYTHON_FRAMEWORK-macosx) \
 		2>&1 | tee -a $$(PYTHON_INSTALL-macosx)/python-$(os).codesign.log
+	find $$(PYTHON_INSTALL_VERSION-macosx)/bin -type f -perm +111 ! -type l -exec codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \; \
+		2>&1 | tee -a $$(PYTHON_INSTALL-macosx)/python-$(os).codesign.log
+	codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f $$(PYTHON_INSTALL_VERSION-macosx)/Resources/Python.app \
+		2>&1 | tee -a $$(PYTHON_INSTALL-macosx)/python-$(os).codesign.log
+	codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f $$(PYTHON_INSTALL_VERSION-macosx)/Resources/Python.app/Contents/MacOS/Python \
+		2>&1 | tee -a $$(PYTHON_INSTALL-macosx)/python-$(os).codesign.log
 
 	# Create XCFramework out of the extracted framework
 	xcodebuild -create-xcframework -output $$(PYTHON_XCFRAMEWORK-$(os)) -framework $$(PYTHON_FRAMEWORK-macosx) \
